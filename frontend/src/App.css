@@ -1,0 +1,137 @@
+/* RESET */
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7fb;
+}
+
+/* CONTENEDOR GENERAL */
+.app-container {
+  width: 100%;
+  text-align: center;
+}
+
+/* LOGIN */
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-box {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 300px;
+}
+
+/* TITULOS */
+.titulo {
+  color: #1e3a8a;
+}
+
+.subtitulo {
+  color: #1e3a8a;
+}
+
+/* FORMULARIO */
+.form-container {
+  background: white;
+  width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* INPUTS */
+input, select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* BOTONES */
+button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background-color: #1e40af;
+}
+
+/* 🔥 CONTENEDOR VEHICULOS (SOLUCIÓN REAL) */
+.vehiculos-container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;              /* 🔥 permite filas */
+  justify-content: flex-start;  /* 🔥 alinea a la izquierda */
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* TARJETAS */
+.vehiculo-card {
+  width: 250px;                 /* 🔥 clave para horizontal */
+  min-width: 250px;
+  max-width: 250px;
+
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+
+  text-align: left;
+}
+
+.vehiculo-card:hover {
+  transform: translateY(-5px);
+}
+
+/* IMAGEN */
+.vehiculo-img {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+/* BOTONES */
+.botones {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.btn-historial {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* HISTORIAL */
+.historial {
+  margin-top: 10px;
+  background: #eef2ff;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.historial-item {
+  border-bottom: 1px solid #ccc;
+  padding: 5px 0;
+}
