@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from models import db, Vehiculo, Usuario, Registro
+from models import db, Vehiculo, Usuario, Registro, Inspeccion
 import os 
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -108,32 +108,32 @@ def options_vehiculo(id):
 
 @app.route("/vehiculos/<int:id>", methods=["PUT"])
 def actualizar_vehiculo(id):
-
     vehiculo = Vehiculo.query.get(id)
 
-    if not vehiculo:
-        return jsonify({"message": "Vehículo no encontrado"}), 404
+    vehiculo.patente = request.form.get("patente")
+    vehiculo.modelo = request.form.get("modelo")
 
-    patente = request.form.get("patente")
-    modelo = request.form.get("modelo")
+    vehiculo.usuario_id = request.form.get("usuario_id")
+
     imagen = request.files.get("imagen")
-
-    vehiculo.patente = patente
-    vehiculo.modelo = modelo
-
     if imagen:
         nombre_imagen = imagen.filename
-        imagen.save(f"uploads/{nombre_imagen}")
+        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_imagen))
         vehiculo.imagen = nombre_imagen
 
     db.session.commit()
 
-    return jsonify({"message": "Vehículo actualizado correctamente"})
-
+    return jsonify({"message": "Vehículo actualizado"})
 
 @app.route("/registro", methods=["POST"])
 def registro():
     data = request.json
+
+
+    rol_solicitante = data.get("rol_solicitante")
+
+    if rol_solicitante != "admin":
+        return jsonify({"message": "Acceso denegado"}), 403
 
 
     nuevo_usuario = Usuario(
@@ -199,31 +199,25 @@ def obtener_usuarios():
 
 @app.route("/registro/inicio", methods=["POST"])
 def iniciar_registro():
-    vehiculo_id = request.form.get("vehiculo_id")
-    conductor = request.form.get("conductor")
-    imagen = request.files.get("foto_inicio")
+    data = request.json  
 
-    nombre_imagen = ""
-
-    if imagen:
-        nombre_imagen = imagen.filename
-        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_imagen))
+    vehiculo_id = data.get("vehiculo_id")
+    conductor = data.get("conductor")
 
     nuevo = Registro(
         vehiculo_id=vehiculo_id,
         conductor=conductor,
         fecha=datetime.now().strftime("%Y-%m-%d"),
-        foto_inicio=nombre_imagen,
         hora_inicio=datetime.now().strftime("%H:%M:%S")
     )
 
     db.session.add(nuevo)
     db.session.commit()
 
-    return jsonify({"message": "Inicio registrado"})
-
-
-
+    return jsonify({
+        "message": "Inicio registrado",
+        "registro_id": nuevo.id
+    })
 
 @app.route("/registro/fin/<int:vehiculo_id>", methods=["PUT"])
 def finalizar_registro(vehiculo_id):
@@ -244,16 +238,16 @@ def finalizar_registro(vehiculo_id):
 
     db.session.commit()
 
-    return jsonify({"message": "Fin registrado"})
+    return jsonify({"message": "Fin registrado", "registro_id": registro.id})
 
 
 @app.route("/registros", methods=["GET"])
 def obtener_registros():
-    registros = Registro.query.order_by(Registro.id.desc()).all()
-
+    registros = Registro.query.all()
     resultado = []
 
     for r in registros:
+        inspeccion = Inspeccion.query.filter_by(registro_id=r.id).first()
         resultado.append({
             "id": r.id,
             "vehiculo_id": r.vehiculo_id,
@@ -262,10 +256,41 @@ def obtener_registros():
             "hora_inicio": r.hora_inicio,
             "hora_fin": r.hora_fin,
             "foto_inicio": r.foto_inicio,
-            "foto_fin": r.foto_fin
+            "foto_fin": r.foto_fin,
+
+            "inspeccion":{
+                "bencina": inspeccion.bencina,
+                "aceite": inspeccion.aceite,
+                "revision_tecnica": inspeccion.revision_tecnica,
+                "papeles": inspeccion.papeles,
+                "observaciones": inspeccion.observaciones
+
+            }if inspeccion else None
         })
 
     return jsonify({"registros": resultado})
+
+@app.route("/inspeccion", methods=["POST"])
+def crear_inspeccion():
+    data = request.json
+
+    nuevo = Inspeccion(
+        registro_id=data.get("registro_id"),
+        bencina=data.get("bencina"),
+        aceite=data.get("aceite"),
+        revision_tecnica=data.get("revision_tecnica"),
+        papeles=data.get("papeles"),
+        observaciones=data.get("observaciones"),
+        fecha=datetime.now().strftime("%Y-%m-%d")
+    )
+
+    db.session.add(nuevo)
+    db.session.commit()
+
+    return jsonify({"message": "Inspección guardada correctamente"})
+    
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -8,6 +8,7 @@ body {
 /* CONTENEDOR GENERAL */
 .app-container {
   width: 100%;
+  padding: 20px 0;
   text-align: center;
 }
 
@@ -39,20 +40,76 @@ body {
   color: #1e3a8a;
 }
 
-/* FORMULARIO */
+/* CONTENEDOR FORM */
 .form-container {
   background: white;
-  width: 400px;
-  margin: 20px auto;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  max-width: 500px;
+  margin: 30px auto;
+  text-align: left;
 }
 
+/* TITULOS */
+.form-container h3 {
+  margin-bottom: 15px;
+  color: #1e90ff;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 5px;
+}
+
+/* INPUTS Y SELECT */
+.form-container input,
+.form-container select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: border 0.2s;
+}
+
+/* FOCUS */
+.form-container input:focus,
+.form-container select:focus {
+  border: 1px solid #1e90ff;
+}
+
+/* BOTONES */
+.form-container button {
+  width: 100%;
+  padding: 12px;
+  background: #1e90ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: all 0.2s;
+}
+
+/* HOVER */
+.form-container button:hover {
+  background: #187bcd;
+}
+
+/* SEPARADOR ENTRE BLOQUES */
+.form-container > div {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+
+.form-container > div:last-child {
+  border-bottom: none;
+}
+.form-section {
+  margin-bottom: 20px;
+}
 /* INPUTS */
 input, select {
   padding: 8px;
@@ -74,53 +131,84 @@ button {
 button:hover {
   background-color: #1e40af;
 }
-
-/* 🔥 CONTENEDOR VEHICULOS (SOLUCIÓN REAL) */
 .vehiculos-container {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;              /* 🔥 permite filas */
-  justify-content: flex-start;  /* 🔥 alinea a la izquierda */
-  align-items: flex-start;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 280px);
+  justify-content: center;
+  gap: 25px;
   padding: 20px;
+
+  align-items: start;
 }
-
-/* TARJETAS */
 .vehiculo-card {
-  width: 250px;                 /* 🔥 clave para horizontal */
-  min-width: 250px;
-  max-width: 250px;
+  width: 260px;
+  background: #ffffff;
 
-  background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 15px;
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
 
-  text-align: left;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  transition: all 0.25s ease;
 }
 
 .vehiculo-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
 
-/* IMAGEN */
+.vehiculo-card {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.vehiculo-card p {
+  margin: 5px 0 10px;
+  color: #555;
+}
+
 .vehiculo-img {
   width: 100%;
-  border-radius: 10px;
-  margin-top: 10px;
-}
+  height: 150px;
+  object-fit: cover;
 
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
 /* BOTONES */
 .botones {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-bottom: 10px;
 }
-
+.botones button {
+  flex: 1;
+  margin: 0 3px;
+}
 .btn-historial {
   width: 100%;
-  margin-top: 10px;
+  margin-top: auto;
+}
+button {
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+
+  background: #2f6fed;
+  color: white;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #1e4fcc;
 }
 
 /* HISTORIAL */
@@ -132,6 +220,405 @@ button:hover {
 }
 
 .historial-item {
-  border-bottom: 1px solid #ccc;
-  padding: 5px 0;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.historial-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.historial-horas {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.historial-inspeccion p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+.obs {
+  font-style: italic;
+  color: #555;
+}
+.historial-img {
+  width: 100px;
+  max-width: 200px;
+  border-radius: 8px;
+  margin-top: 5px;
+}
+
+.imagenes-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.imagen-box {
+  text-align: center;
+}
+
+.imagen-box img {
+  width: 140px;
+  border-radius: 8px;
+  border: 2px solid #2563eb;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #1e3a8a;
+  margin-bottom: 5px;
+}
+
+.comparador-container {
+  margin-top: 10px;
+}
+
+.comparador {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.img-base {
+  width: 100%;
+  display: block;
+}
+
+.img-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.img-overlay img {
+  width: 100%;
+  display: block;
+}
+
+.slider {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.label-antes {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white;
+}
+.label-despues {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: white;
+} 
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
+
+  animation: fadeIn 0.3s ease;
+}
+
+
+.modal-pro {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 600px;
+  max-width: 95%;
+  max-height: 85vh;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  padding: 20px;
+
+  overflow-y: auto;  
+}
+
+.close-btn {
+  border: none;
+  background: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* INSPECCION */
+.inspeccion-pro {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  background: #f7f9fc;
+}
+
+/* COLORES */
+.Rojo {
+  color: #e53935;
+  font-weight: bold;
+}
+
+.Verde {
+  color: #43a047;
+  font-weight: bold;
+}
+
+/* COMPARADOR */
+.comparador {
+  position: relative;
+  margin-top: 20px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+/* ANIMACIONES */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* CONTENEDOR DOBLE */
+.comparacion-doble {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* CADA FOTO */
+.foto-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.foto-box img {
+  width: 100%;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.foto-box img:hover {
+  transform: scale(1.03);
+}
+
+/* LABEL */
+.label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+/* MODAL FULL IMG */
+.modal-img {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 2000;
+}
+.modal-img.active {
+  background: rgba(0,0,0,0.9);
+  opacity: 1;
+}
+
+/* IMAGEN */
+.img-zoom {
+  max-width: 60%;
+  max-height: 60%;
+  border-radius: 10px;
+
+  transform: scale(0.7);
+  transition: transform 0.3s ease;
+}
+
+/* EFECTO ZOOM */
+.modal-img.active .img-zoom {
+  transform: scale(1);
+}
+
+.modal-img img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.conductor-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+  gap: 25px;
+  justify-content: center;
+  padding: 30px;
+}
+
+/* TARJETA */
+.conductor-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+/* EFECTO HOVER */
+.conductor-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+/* TITULO VEHICULO */
+.vehiculo-titulo {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+/* IMAGEN */
+.conductor-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+/* GRUPO INPUT + BOTON */
+.input-group {
+  margin-bottom: 15px;
+}
+
+/* INPUT FILE */
+.input-group input {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+/* BOTON INICIAR */
+.btn-iniciar {
+  width: 100%;
+  padding: 10px;
+  background: #1e90ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-iniciar:hover {
+  background: #187bcd;
+}
+
+/* BOTON FINALIZAR */
+.btn-finalizar {
+  width: 100%;
+  padding: 10px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-finalizar:hover {
+  background: #c0392b;
+}
+
+/* SUBTITULO */
+.subtitulo {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 24px;
 }

@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import { useRef } from "react";
+
+
 
 
 function App() {
+  const formRef = useRef(null);
   const [vehiculos, setVehiculos] = useState([]);
   const [patente, setPatente] = useState("");
   const [modelo, setModelo] = useState("");
@@ -20,6 +24,18 @@ function App() {
   const [fotoFin, setFotoFin] = useState(null);
   const [registros, setRegistros] = useState([]);
   const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState(null);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [registroActual, setRegistroActual] = useState(null);
+  const [bencina, setBencina] = useState("");
+  const [aceite, setAceite] = useState("");
+  const [revisionTecnica, setRevisionTecnica] = useState("");
+  const [papeles, setPapeles] = useState("");
+  const [obs, setObs] = useState("");
+  const [registroSeleccionado, setRegistroSeleccionado] = useState(null);
+  const [imagenFull, setImagenFull] = useState(null);
+  const [historialAbierto, setHistorialAbierto] = useState({});
+  const [mostrarModalInspeccion, setMostrarModalInspeccion] = useState(false);
+
 
   useEffect(() => {
   obtenerVehiculo();
@@ -31,7 +47,17 @@ function App() {
   fetch("http://127.0.0.1:5000/registros")
     .then(res => res.json())
     .then(data => setRegistros(data.registros));
+  
+  
 
+}, [usuario]);
+useEffect(() => {
+  if (usuario?.rol === "admin") {
+    setNombre("");
+    setCorreo("");
+    setPassword("");
+    setRolRegistro("conductor");
+  }
 }, [usuario]);
 
   const login = () => {
@@ -95,9 +121,9 @@ const actualizarVehiculo = () => {
   const formData = new FormData();
   formData.append("patente", patente);
   formData.append("modelo", modelo);
-  if (imagen) {
-    formData.append("imagen", imagen);
-  }
+  formData.append("imagen", imagen);
+
+  formData.append("usuario_id", usuarioSeleccionado);
 
   fetch(`http://127.0.0.1:5000/vehiculos/${editandoId}`, {
     method: "PUT",
@@ -105,13 +131,13 @@ const actualizarVehiculo = () => {
   })
   .then(() => {
     obtenerVehiculo();
+    setEditandoId(null);
     setPatente("");
     setModelo("");
     setImagen(null);
-    setEditandoId(null);
+    setUsuarioSeleccionado("");
   });
 };
-
 
 const registrarUsuario = () => {
   fetch("http://127.0.0.1:5000/registro", {
@@ -123,7 +149,8 @@ const registrarUsuario = () => {
       nombre,
       correo,
       password,
-      rol: rolRegistro
+      rol: rolRegistro,
+      rol_solicitante: usuario.rol
     })
   })
   .then(() => {
@@ -140,34 +167,70 @@ const registrarUsuario = () => {
 
 };
 
-const iniciarUso = (vehiculoId) => {
-
-    const formData = new FormData();
-    formData.append("vehiculo_id", vehiculoId);
-    formData.append("conductor", usuario.nombre);
-    formData.append("foto_inicio", fotoInicio);
-
-    fetch("http://127.0.0.1:5000/registro/inicio",{
-      method: "POST",
-      body: formData
+const iniciarUso = (vehiculo_id) => {
+  fetch("http://127.0.0.1:5000/registro/inicio", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      vehiculo_id: vehiculo_id,
+      conductor: usuario.nombre 
     })
-    .then(() => alert("Inicio registrado"));
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("Iniciado:", data);
+  })
+  .catch(() => alert("Error al iniciar"));
+};
 
-    };
-  
-  const finalizarUso = (vehiculoId) => {
+const finalizarUso = (vehiculo_id) => {
+  const formData = new FormData();
 
-    const formData = new FormData();
+  if (fotoFin) {
     formData.append("foto_fin", fotoFin);
-    
-    fetch(`http://127.0.0.1:5000/registro/fin/${vehiculoId}`,{
-      method: "PUT",
-      body: formData
+  }
+
+  fetch(`http://127.0.0.1:5000/registro/fin/${vehiculo_id}`, {
+    method: "PUT",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("Respuesta:", data);
+
+    setRegistroActual(data.registro_id);
+    setMostrarModal(true);
+  })
+  .catch(err => console.error(err));
+};
+
+
+
+const guardarInspeccion = () => {
+  console.log("registroActual:", registroActual); 
+  fetch("http://127.0.0.1:5000/inspeccion", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      registro_id: registroActual,
+      bencina,
+      aceite,
+      revision_tecnica: revisionTecnica,
+      papeles,
+      observaciones: obs
     })
-    .then(() => alert("Fin registrado"));
-  };
-
-
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("Inspección guardada");
+    setMostrarModal(false);
+  })
+  .catch(() => alert("Error al guardar"));
+};
     
 
   if (!usuario) {
@@ -204,75 +267,136 @@ const iniciarUso = (vehiculoId) => {
       <>
         <h2 className="subtitulo">Vista Conductor</h2>
 
-        {vehiculos.map((v) => (
-          <div key={v.id}>
-            <p>{v.patente} - {v.modelo}</p>
+        <div className="conductor-container">
+  {vehiculos.map((v) => (
+    <div key={v.id} className="conductor-card">
 
-            {v.imagen && (
-              <img 
-                src={`http://127.0.0.1:5000/uploads/${v.imagen}`} 
-                width="200"
-              />
-            )}
+      <p className="vehiculo-titulo">
+        {v.patente} - {v.modelo}
+      </p>
 
-            <input
-              type="file"
-              onChange={(e) => setFotoInicio(e.target.files[0])}
-            />
-            <button onClick={() => iniciarUso(v.id)}>Iniciar</button>
+      {v.imagen && (
+        <img 
+          src={`http://127.0.0.1:5000/uploads/${v.imagen}`} 
+          className="conductor-img"
+          alt="vehiculo"
+        />
+      )}
 
-            <input
-              type="file"
-              onChange={(e) => setFotoFin(e.target.files[0])}
-            />
-            <button onClick={() => finalizarUso(v.id)}>Finalizar</button>
-          </div>
-        ))}
+      <div className="input-group">
+        <input
+          type="file"
+          onChange={(e) => setFotoInicio(e.target.files[0])}
+        />
+        <button 
+          className="btn-iniciar"
+          onClick={() => iniciarUso(v.id)}
+        >
+          Iniciar
+        </button>
+      </div>
+
+      <div className="input-group">
+        <input
+          type="file"
+          onChange={(e) => setFotoFin(e.target.files[0])}
+        />
+        <button 
+          className="btn-finalizar"
+          onClick={() => finalizarUso(v.id)}
+        >
+          Finalizar
+        </button>
+      </div>
+
+    </div>
+  ))}
+</div>
       </>
     ) : (
       <>
-        <h2 className="subtitulo">Vista Supervisor</h2>
+        <h2 className="subtitulo"> 
+          {usuario.rol === "admin" ? "Vista Admin" : "Vista Supervisor"}
+        </h2>
 
-{/* FORMULARIO ARRIBA */}
-<div className="form-container">
-  <h3>{editandoId ? "Editar Vehículo" : "Agregar Vehículo"}</h3>
+        {/* FORMULARIO */}
+        <div className="form-container" ref={formRef}>
 
-  <input 
-    placeholder="Patente"
-    value={patente}
-    onChange={(e) => setPatente(e.target.value)}
-  />
+          {usuario.rol === "admin" && (
+            <div className="form-section">
+              <h3>Registrar Usuario</h3>
+              
+              <input
+                placeholder="Nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+              />
+              
+              <input
+                placeholder="Correo"
+                value={correo}
+                onChange={(e) => setCorreo(e.target.value)}
+              />
+              
+              <input
+                type="password"
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
 
-  <input
-    placeholder="Modelo"
-    value={modelo}
-    onChange={(e) => setModelo(e.target.value)}
-  />
+              <select
+                value={rolRegistro}
+                onChange={(e) => setRolRegistro(e.target.value)}
+              >
+                <option value="conductor">Conductor</option>
+                <option value="supervisor">Supervisor</option>
+                <option value="admin">Admin</option>
+              </select>
 
-  <input
-    type="file"
-    onChange={(e) => setImagen(e.target.files[0])}
-  />
+              <button onClick={registrarUsuario}>Crear usuario</button>
+            </div>
+          )}
 
-  <select 
-    value={usuarioSeleccionado}
-    onChange={(e) => setUsuarioSeleccionado(e.target.value)}
-  >
-    <option value="">Seleccionar conductor</option>
-    {usuarios.map(u => (
-      <option key={u.id} value={u.id}>{u.nombre}</option>
-    ))}
-  </select>
+          <h3>{editandoId ? "Editar Vehículo" : "Agregar Vehículo"}</h3>
 
-  {editandoId ? (
-    <button onClick={actualizarVehiculo}>Actualizar</button>
-  ) : (
-    <button onClick={crearVehiculo}>Guardar</button>
-  )}
-</div>
+          <input 
+            placeholder="Patente"
+            value={patente}
+            onChange={(e) => setPatente(e.target.value)}
+          />
 
-{/* VEHICULOS ABAJO */}
-<div className="vehiculos-container">
+          <input
+            placeholder="Modelo"
+            value={modelo}
+            onChange={(e) => setModelo(e.target.value)}
+          />
+
+          <input
+            type="file"
+            onChange={(e) => setImagen(e.target.files[0])}
+          />
+
+          <select 
+            value={usuarioSeleccionado}
+            onChange={(e) => setUsuarioSeleccionado(e.target.value)}
+          >
+            <option value="">Seleccionar conductor</option>
+            {usuarios.map(u => (
+              <option key={u.id} value={u.id}>{u.nombre}</option>
+            ))}
+          </select>
+
+          {editandoId ? (
+            <button onClick={actualizarVehiculo}>Actualizar</button>
+          ) : (
+            <button onClick={crearVehiculo}>Guardar</button>
+          )}
+
+        </div>
+
+        {/* VEHICULOS */}
+        <div className="vehiculos-container">
   {vehiculos.map((v) => (
     <div key={v.id} className="vehiculo-card">
 
@@ -292,50 +416,238 @@ const iniciarUso = (vehiculoId) => {
         </button>
 
         <button onClick={() => {
-          setEditandoId(v.id);
-          setPatente(v.patente);
-          setModelo(v.modelo);
-        }}>
-          Editar
-        </button>
+  setEditandoId(v.id);
+  setPatente(v.patente);
+  setModelo(v.modelo);
+
+  formRef.current?.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}}>
+  Editar
+</button>
       </div>
 
       <button
         className="btn-historial"
         onClick={() =>
-          setVehiculoSeleccionado(
-            vehiculoSeleccionado === v.id ? null : v.id
-          )
+          setHistorialAbierto(prev => ({
+            ...prev,
+            [v.id]: !prev[v.id]
+          }))
         }
       >
         Ver historial
       </button>
 
-      {vehiculoSeleccionado === v.id && (
+      {historialAbierto[v.id] && (
         <div className="historial">
           {registros
-            .filter(r => r.vehiculo_id === v.id)
-            .map((r, index) => (
-              <div key={index} className="historial-item">
+            .filter(r => r && r.vehiculo_id === v.id)
+            .map((r) => (
+              <div key={r.id} className="historial-item">
+
                 <p><strong>{r.conductor}</strong></p>
                 <p>{r.fecha}</p>
                 <p>Inicio: {r.hora_inicio}</p>
                 <p>Fin: {r.hora_fin}</p>
+
+                <button
+                  onClick={() => setRegistroSeleccionado(r)}
+                  className="btn-detalle"
+                >
+                  Ver detalle
+                </button>
+
               </div>
-          ))}
+            ))}
         </div>
       )}
 
     </div>
   ))}
 </div>
-      </> 
-      
+
+      </>
     )}
+
+    {registroSeleccionado && (
+  <div 
+    className="modal-overlay"
+    onClick={() => setRegistroSeleccionado(null)}
+  >
+
+    <div 
+      className="modal-pro"
+      onClick={(e) => e.stopPropagation()}
+    >
+
+      {/* HEADER */}
+      <div className="modal-header">
+        <h3>Detalle del Registro</h3>
+        <button 
+          className="close-btn"
+          onClick={() => setRegistroSeleccionado(null)}
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* BODY CON SCROLL */}
+      <div className="modal-body">
+
+        <div className="grid">
+          <p><strong>Conductor:</strong> {registroSeleccionado.conductor}</p>
+          <p><strong>Fecha:</strong> {registroSeleccionado.fecha}</p>
+          <p><strong>Inicio:</strong> {registroSeleccionado.hora_inicio}</p>
+          <p><strong>Fin:</strong> {registroSeleccionado.hora_fin}</p>
+        </div>
+
+        {/* INSPECCIÓN */}
+        {registroSeleccionado.inspeccion && (
+          <div className="inspeccion-pro">
+            <h4>Inspección</h4>
+
+            <p>
+              <strong>Bencina:</strong>{" "}
+              <span className={
+                registroSeleccionado.inspeccion.bencina < 25 ? "Rojo" : "Verde"
+              }>
+                {registroSeleccionado.inspeccion.bencina}%
+              </span>
+            </p>
+
+            <p>
+              <strong>Aceite:</strong>{" "}
+              <span className={
+                registroSeleccionado.inspeccion.aceite === "Bajo" ? "Rojo" : "Verde"
+              }>
+                {registroSeleccionado.inspeccion.aceite}
+              </span>
+            </p>
+
+            <p>
+              <strong>Revisión Técnica:</strong>{" "}
+              <span className={
+                new Date(registroSeleccionado.inspeccion.revision_tecnica) < new Date()
+                  ? "Rojo"
+                  : "Verde"
+              }>
+                {registroSeleccionado.inspeccion.revision_tecnica}
+              </span>
+            </p>
+
+            <p>
+              <strong>Papeles:</strong>{" "}
+              <span className={
+                registroSeleccionado.inspeccion.papeles === "faltan" ? "Rojo" : "Verde"
+              }>
+                {registroSeleccionado.inspeccion.papeles}
+              </span>
+            </p>
+
+            <p>
+              <strong>Observaciones:</strong>{" "}
+              {registroSeleccionado.inspeccion.observaciones}
+            </p>
+          </div>
+        )}
+
+        {/* COMPARADOR */}
+        {registroSeleccionado.foto_inicio && registroSeleccionado.foto_fin && (
+  <div className="comparacion-doble">
+
+    {/* ANTES */}
+    <div className="foto-box">
+      <span className="label">Antes</span>
+      <img
+        src={`http://127.0.0.1:5000/uploads/${registroSeleccionado.foto_inicio}`}
+        onClick={() =>
+          setImagenFull(`http://127.0.0.1:5000/uploads/${registroSeleccionado.foto_inicio}`)
+        }
+      />
+    </div>
+
+    {/* DESPUÉS */}
+    <div className="foto-box">
+      <span className="label">Después</span>
+      <img
+        src={`http://127.0.0.1:5000/uploads/${registroSeleccionado.foto_fin}`}
+        onClick={() =>
+          setImagenFull(`http://127.0.0.1:5000/uploads/${registroSeleccionado.foto_fin}`)
+        }
+      />
+    </div>
+
+
+  </div>
+)}
+
+      </div>
+
+    </div>
+  </div>
+)}
+{imagenFull && (
+  <div className="modal-img active" onClick={() => setImagenFull(null)}>
+    <img src={imagenFull} className="img-zoom" />
+  </div>
+)}
+{mostrarModal && (
+  <div className="modal">
+    <div className="modal-box">
+
+      <h3>Inspección del Vehículo</h3>
+
+      <input
+        placeholder="Bencina (%)"
+        value={bencina}
+        onChange={(e) => setBencina(e.target.value)}
+      />
+
+      <select value={aceite} onChange={(e) => setAceite(e.target.value)}>
+        <option value="">Aceite</option>
+        <option value="OK">OK</option>
+        <option value="Bajo">Bajo</option>
+      </select>
+
+      <input
+        type="date"
+        value={revisionTecnica}
+        onChange={(e) => setRevisionTecnica(e.target.value)}
+      />
+
+      <select value={papeles} onChange={(e) => setPapeles(e.target.value)}>
+        <option value="">Papeles</option>
+        <option value="OK">OK</option>
+        <option value="faltan">Faltan</option>
+      </select>
+
+      <textarea
+        placeholder="Observaciones"
+        value={obs}
+        onChange={(e) => setObs(e.target.value)}
+      />
+
+      <button onClick={guardarInspeccion}>
+        Guardar inspección
+      </button>
+
+      <button onClick={() => setMostrarModal(false)}>
+        Cancelar
+      </button>
+
+    </div>
+  </div>
+)}
   </div>
 );
 
+
+
 }
+
 
 
 export default App;

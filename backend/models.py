@@ -32,3 +32,13 @@ class Registro(db.Model):
     foto_fin = db.Column(db.String(200))
     hora_fin = db.Column(db.String(50))
 
+class Inspeccion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    registro_id = db.Column(db.Integer, nullable=False)
+    bencina = db.Column(db.String(50))
+    aceite = db.Column(db.String(50))
+    revision_tecnica = db.Column(db.String(50))
+    papeles = db.Column(db.String(50))
+    observaciones = db.Column(db.Text)
+
+    fecha = db.Column(db.String(50))
